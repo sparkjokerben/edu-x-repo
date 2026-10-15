@@ -265,7 +265,7 @@ jobs:
 
       # 版本元数据：服务端据此镜像最近几个版本的安装包。先拿 Release 的
       # 资产名单做对照——工件里有、资产里没有的直接报错，绝不生成指向
-      # 404 的下载地址。
+      # 404 的下载地址；台账同时清掉已不存在的 Release 条目。
       - name: 生成版本元数据
         env:
           # 内置 token：permissions 里已给本仓 contents: write，发布与读资产都够
@@ -273,8 +273,11 @@ jobs:
         run: |
           TAG="v${VERSION}"
           gh release view "$TAG" --repo sparkjokerben/edu-x-repo --json assets --jq '.assets[].name' > assets.txt
+          # 台账只留真实存在的 Release：被删掉的（下架、作废重发）不再留在元数据里指向 404
+          gh release list --repo sparkjokerben/edu-x-repo --limit 200 --json tagName --jq '.[].tagName' > releases.txt
           node tools/release-meta.mjs --dir artifacts --out distwork/releases.json \
-            --version "$VERSION" --tag "$TAG" --repo sparkjokerben/edu-x-repo --assets assets.txt
+            --version "$VERSION" --tag "$TAG" --repo sparkjokerben/edu-x-repo \
+            --assets assets.txt --releases releases.txt
 
       - name: 提交推送分发仓
         run: |
