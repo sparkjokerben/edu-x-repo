@@ -30,6 +30,17 @@ jobs:
     timeout-minutes: 45
 
     steps:
+      - name: 校验发行引用（外部输入，先收口）
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          case "$REF" in
+            '' | *[!A-Za-z0-9._/-]*)
+              echo "发行引用不合法：$REF" >&2
+              exit 1
+              ;;
+          esac
+
       - name: 取代码（私有主仓）
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -82,6 +93,17 @@ jobs:
     timeout-minutes: 45
 
     steps:
+      - name: 校验发行引用（外部输入，先收口）
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          case "$REF" in
+            '' | *[!A-Za-z0-9._/-]*)
+              echo "发行引用不合法：$REF" >&2
+              exit 1
+              ;;
+          esac
+
       - name: 取代码（私有主仓）
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -135,6 +157,17 @@ jobs:
     timeout-minutes: 30
 
     steps:
+      - name: 校验发行引用（外部输入，先收口）
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          case "$REF" in
+            '' | *[!A-Za-z0-9._/-]*)
+              echo "发行引用不合法：$REF" >&2
+              exit 1
+              ;;
+          esac
+
       - name: 取代码（私有主仓）
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
