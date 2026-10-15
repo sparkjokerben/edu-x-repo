@@ -1,0 +1,17 @@
+{
+  "name": "@deepseek-ai/schemastery",
+  "versions": {
+    "3.18.4": {
+      "name": "@deepseek-ai/schemastery",
+      "version": "3.18.4",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/deepseek-ai-schemastery-3.18.4.tgz",
+        "shasum": "1282eef311bb0cfdffca5881fce27fa77a6bbe73",
+        "integrity": "sha512-SSXO6tYuyrIqKVbmOnIq0s+riUywYzouFMcnBluHF9n4KMo2G8HvEzhCYj6pj2617/glOjbJuVInJ9hfONsjkg=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "3.18.4"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@edu-x/extension-hint",
+  "versions": {
+    "0.1.0": {
+      "name": "@edu-x/extension-hint",
+      "version": "0.1.0",
+      "description": "edu-x 示例扩展：今日提示（官方仓库安装链路的试点样品：宿主出一条数据，客户端开一张卡片）",
+      "dsh": {
+        "bundle": {
+          "patch": "./cordis.patch.yml"
+        },
+        "client": {
+          "platform": "web"
+        }
+      },
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/edu-x-extension-hint-0.1.0.tgz",
+        "shasum": "10bc4bde31c791439854b74cdcf399c5b0a4a080",
+        "integrity": "sha512-uQUm0AHGZRsu8tInX50JTjMXsEzJFzTBMzDAhB5JxeTu6eazG7YB9swpoRwdP7DbCHmYjyLKCqKxv8CsW8MqVA=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.1.0"
+  }
+}

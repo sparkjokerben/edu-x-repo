@@ -1,0 +1,17 @@
+{
+  "name": "@standard-schema/spec",
+  "versions": {
+    "1.1.0": {
+      "name": "@standard-schema/spec",
+      "version": "1.1.0",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/standard-schema-spec-1.1.0.tgz",
+        "shasum": "a79b55dbaf8604812f52d140b2c9ab41bc150bb8",
+        "integrity": "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "1.1.0"
+  }
+}

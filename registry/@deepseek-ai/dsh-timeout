@@ -1,0 +1,17 @@
+{
+  "name": "@deepseek-ai/dsh-timeout",
+  "versions": {
+    "0.2.0-rc.2": {
+      "name": "@deepseek-ai/dsh-timeout",
+      "version": "0.2.0-rc.2",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/deepseek-ai-dsh-timeout-0.2.0-rc.2.tgz",
+        "shasum": "54101c8a86384057f21a79bde25a2eccae44b035",
+        "integrity": "sha512-NDob8b8DJDB/sDPz3P7xhrkxOh1O9FbN1EZRKsxP4fuTfp4hrQU7aekYS5qZENFKoR8dBJMTh/zcEBw4m31glQ=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.2.0-rc.2"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@deepseek-ai/cosmokit",
+  "versions": {
+    "1.8.5": {
+      "name": "@deepseek-ai/cosmokit",
+      "version": "1.8.5",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/deepseek-ai-cosmokit-1.8.5.tgz",
+        "shasum": "449e00e6c247790fc71f73f56f0ef79874882326",
+        "integrity": "sha512-LXsrlem9z8dq4sLflj2yuCuYX7KqhdzF5hZly3eZyuTo8d6oDSOXuEgC5DbQWKW+lksm6zmOutQLsP/ma6wR6A=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "1.8.5"
+  }
+}

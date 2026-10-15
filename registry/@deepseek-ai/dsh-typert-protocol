@@ -1,0 +1,17 @@
+{
+  "name": "@deepseek-ai/dsh-typert-protocol",
+  "versions": {
+    "0.2.0-rc.2": {
+      "name": "@deepseek-ai/dsh-typert-protocol",
+      "version": "0.2.0-rc.2",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/deepseek-ai-dsh-typert-protocol-0.2.0-rc.2.tgz",
+        "shasum": "48f9491f93d11c17eb4235b29701080f3388b3c8",
+        "integrity": "sha512-95RvIDcVac2BWdv1IxN6yKlRV+8eEvkofqSxV+d0r8x1kx2EIWEsbdxz6C+coYIm+8e03MiN+rwOt8J7sLfe7Q=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.2.0-rc.2"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "@edu-x/plugin-ai",
+  "versions": {
+    "0.1.0": {
+      "name": "@edu-x/plugin-ai",
+      "version": "0.1.0",
+      "description": "edu-x 平台：edu-x 网关的 llm 适配器（agent 循环）与插件用的单次调用服务",
+      "dependencies": {
+        "@deepseek-ai/cordis": "4.0.4",
+        "@deepseek-ai/dsh-launch-environment": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-llm": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-session": "0.2.0-rc.2"
+      },
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/edu-x-plugin-ai-0.1.0.tgz",
+        "shasum": "eb4096fcea6c6349f74b7124ad5acc230fd0d5a8",
+        "integrity": "sha512-ZmYIj+kR3lxuxFcvdVS0XXfdz+eB0A8yTBVvgf81l5dHHfVB6TpUE69IPLNq+HTDI2s5lckxRVGzD7J4z9Bwlg=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.1.0"
+  }
+}

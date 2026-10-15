@@ -1,0 +1,17 @@
+{
+  "name": "@node-rs/jieba-android-arm-eabi",
+  "versions": {
+    "2.0.3": {
+      "name": "@node-rs/jieba-android-arm-eabi",
+      "version": "2.0.3",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/node-rs-jieba-android-arm-eabi-2.0.3.tgz",
+        "shasum": "6cf3799a1c490c14576a2e1ddd9e6db6ed42fa18",
+        "integrity": "sha512-1gzgvufnDttRGEDu1gVAuiG8FDPvfEfW6+8Lnj4MvOVcU8GiBGevt73crmt8Hg+BSHPGCiKacwOUE0CMjUWeug=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "2.0.3"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@node-rs/jieba",
+  "versions": {
+    "2.0.3": {
+      "name": "@node-rs/jieba",
+      "version": "2.0.3",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/node-rs-jieba-2.0.3.tgz",
+        "shasum": "bce9c0c2ccb4661ebe0d5e69b2675aeb39b6bf6b",
+        "integrity": "sha512-WfTweEAbwHNPV4BvbhyQfG5E4wUQWnjy7x9Li4yYgwm+c4hlkuREkMcpCS0tTo+eTyDIBZ/kFVylns2blPBZxg=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "2.0.3"
+  }
+}

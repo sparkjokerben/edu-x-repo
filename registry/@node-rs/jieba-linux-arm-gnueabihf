@@ -1,0 +1,17 @@
+{
+  "name": "@node-rs/jieba-linux-arm-gnueabihf",
+  "versions": {
+    "2.0.3": {
+      "name": "@node-rs/jieba-linux-arm-gnueabihf",
+      "version": "2.0.3",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/node-rs-jieba-linux-arm-gnueabihf-2.0.3.tgz",
+        "shasum": "f1f05c0d0638e10ce84877071692a1a5f0b19a52",
+        "integrity": "sha512-gka8cb+o/WQcPfwstQ0yQGakf/FM5vBr1sx5AMcdztWZQ9sTQ9nzzbPn5IxGNQWdZjFBwcrLizq8lhNU668Fzg=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "2.0.3"
+  }
+}

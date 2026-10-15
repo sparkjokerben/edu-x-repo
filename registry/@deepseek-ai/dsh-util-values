@@ -1,0 +1,17 @@
+{
+  "name": "@deepseek-ai/dsh-util-values",
+  "versions": {
+    "0.2.0-rc.2": {
+      "name": "@deepseek-ai/dsh-util-values",
+      "version": "0.2.0-rc.2",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/deepseek-ai-dsh-util-values-0.2.0-rc.2.tgz",
+        "shasum": "ce1b18331b803925de7cf92a5717a52b04948a78",
+        "integrity": "sha512-qgpsbgiZABuE9UvgNaVo9b2HiWwLeU93CTl9PFXqE0jN8ap1ALxzQsLGvr/q2MJuWDYqnFBg60XnqnY8ZxPWEg=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.2.0-rc.2"
+  }
+}

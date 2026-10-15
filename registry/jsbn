@@ -1,0 +1,17 @@
+{
+  "name": "jsbn",
+  "versions": {
+    "1.1.0": {
+      "name": "jsbn",
+      "version": "1.1.0",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/jsbn-1.1.0.tgz",
+        "shasum": "b01307cb29b618a1ed26ec79e911f803c4da0040",
+        "integrity": "sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "1.1.0"
+  }
+}

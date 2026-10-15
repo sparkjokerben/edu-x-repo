@@ -1,0 +1,17 @@
+{
+  "name": "@node-rs/jieba-darwin-x64",
+  "versions": {
+    "2.0.3": {
+      "name": "@node-rs/jieba-darwin-x64",
+      "version": "2.0.3",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/node-rs-jieba-darwin-x64-2.0.3.tgz",
+        "shasum": "fccd52e4db7e23a623475465579c7d930aeff80e",
+        "integrity": "sha512-k1hg7TaBMEloyZDwsrYWT69ufnRrRYN6ZtF3b64lKX/lDhx1NTgEar6OxeuOScfyneb6f7+o43gB1vqfbbsfXQ=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "2.0.3"
+  }
+}

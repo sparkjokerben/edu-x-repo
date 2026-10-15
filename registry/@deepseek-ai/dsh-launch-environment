@@ -1,0 +1,17 @@
+{
+  "name": "@deepseek-ai/dsh-launch-environment",
+  "versions": {
+    "0.2.0-rc.2": {
+      "name": "@deepseek-ai/dsh-launch-environment",
+      "version": "0.2.0-rc.2",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/deepseek-ai-dsh-launch-environment-0.2.0-rc.2.tgz",
+        "shasum": "d9256c20fcc7630a28c3ddb243a6b13f58acc095",
+        "integrity": "sha512-IyhZjJJQ7RVLcKlc4pPPjojOKrr2XCYm7VRpslFq7bvGj3DGt8WMTSCCZUWxCThY2jg6kFF1ujiTGunELfRO6Q=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.2.0-rc.2"
+  }
+}

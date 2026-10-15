@@ -1,0 +1,17 @@
+{
+  "name": "@deepseek-ai/dsh-session",
+  "versions": {
+    "0.2.0-rc.2": {
+      "name": "@deepseek-ai/dsh-session",
+      "version": "0.2.0-rc.2",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/deepseek-ai-dsh-session-0.2.0-rc.2.tgz",
+        "shasum": "150a68375fd7d52f978b02db0dcef3895e2c9301",
+        "integrity": "sha512-wj+6MeqCYbDcbEvKH3puHyEGdjyu51JwBoN6Ua2tz6griLufDgLM5HpSU40L5xgpbOfrYVhXZs4vRgOrMlFY2g=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.2.0-rc.2"
+  }
+}

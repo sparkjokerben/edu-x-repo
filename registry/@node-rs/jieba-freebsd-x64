@@ -1,0 +1,17 @@
+{
+  "name": "@node-rs/jieba-freebsd-x64",
+  "versions": {
+    "2.0.3": {
+      "name": "@node-rs/jieba-freebsd-x64",
+      "version": "2.0.3",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/node-rs-jieba-freebsd-x64-2.0.3.tgz",
+        "shasum": "ebf232e6ceefa98c369a658e90e2060001ecddab",
+        "integrity": "sha512-hgmnTFT2AkLVjN5+CQW/U5x5lSqJqgUuEoqoOcHk2hxtFe3ZzuFxOzfQAIgKsEifkgrvljsCShZHcunRGuY8vA=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "2.0.3"
+  }
+}

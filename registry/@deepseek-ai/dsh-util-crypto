@@ -1,0 +1,17 @@
+{
+  "name": "@deepseek-ai/dsh-util-crypto",
+  "versions": {
+    "0.2.0-rc.2": {
+      "name": "@deepseek-ai/dsh-util-crypto",
+      "version": "0.2.0-rc.2",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/deepseek-ai-dsh-util-crypto-0.2.0-rc.2.tgz",
+        "shasum": "e8ee1e3d9ccb3915b7627db4c4e2470c7b34f29c",
+        "integrity": "sha512-5OvvmepY69uXTagUMlnoHqg7euI4ZMifLgfdV8xZO20OslWGGiRCkJbZRyDtcJG9GsXWz9UimfWmUu52zKXJ5w=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.2.0-rc.2"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@deepseek-ai/dsh-typert-registry",
+  "versions": {
+    "0.2.0-rc.2": {
+      "name": "@deepseek-ai/dsh-typert-registry",
+      "version": "0.2.0-rc.2",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/deepseek-ai-dsh-typert-registry-0.2.0-rc.2.tgz",
+        "shasum": "75e96f7d41fdeb2c438a8c1633362aea5c0543f3",
+        "integrity": "sha512-Hjepcu0cDTH4rz/SB121SVozg9ix79NBB+HNr0jW0GSHG9O24kNDyufAJD2/S4B97KVN+1nM0T8k1Dx2JSOEWQ=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.2.0-rc.2"
+  }
+}

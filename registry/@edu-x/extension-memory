@@ -1,0 +1,37 @@
+{
+  "name": "@edu-x/extension-memory",
+  "versions": {
+    "0.1.0": {
+      "name": "@edu-x/extension-memory",
+      "version": "0.1.0",
+      "description": "edu-x 业务插件：我的记忆（SQLite 自持库、jieba 检索、SM3 完整性、提卡确认与记忆页）",
+      "dsh": {
+        "bundle": {
+          "patch": "./cordis.patch.yml"
+        },
+        "client": {
+          "platform": "web"
+        }
+      },
+      "dependencies": {
+        "@deepseek-ai/cordis": "4.0.4",
+        "@deepseek-ai/dsh-launch-environment": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-typert-registry": "0.2.0-rc.2",
+        "@edu-x/plugin-ai": "0.1.0",
+        "@edu-x/shared": "0.1.0",
+        "@node-rs/jieba": "2.0.3",
+        "zod": "4.6.5"
+      },
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/edu-x-extension-memory-0.1.0.tgz",
+        "shasum": "e87664ba83b3af8e7615ee26f132c7f9d99d4641",
+        "integrity": "sha512-oenpgUskZmgg/9vJ8GuNh3xUpYN1pNKXfEkQz2pCwSaigc1dBGPQLzP+M29cnfwIkKNck+YL0fm68trBMMP7/Q=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.1.0"
+  }
+}

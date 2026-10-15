@@ -1,0 +1,17 @@
+{
+  "name": "@node-rs/jieba-android-arm64",
+  "versions": {
+    "2.0.3": {
+      "name": "@node-rs/jieba-android-arm64",
+      "version": "2.0.3",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/node-rs-jieba-android-arm64-2.0.3.tgz",
+        "shasum": "3418323fb00d5dde1788605df0cabf7aa37a5bc3",
+        "integrity": "sha512-Q65QkV58y2ac0uGnzQHGuQkIwzGqneUwhUZk6LdYnowfF8ammoOu7N9EB4ZhKrr8qiHl0RVkjoEZ03/vP/VkHQ=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "2.0.3"
+  }
+}

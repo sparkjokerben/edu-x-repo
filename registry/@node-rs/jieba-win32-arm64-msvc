@@ -1,0 +1,17 @@
+{
+  "name": "@node-rs/jieba-win32-arm64-msvc",
+  "versions": {
+    "2.0.3": {
+      "name": "@node-rs/jieba-win32-arm64-msvc",
+      "version": "2.0.3",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/node-rs-jieba-win32-arm64-msvc-2.0.3.tgz",
+        "shasum": "fc847af421947e73ad1d30cd8bfee29d30e7fc6d",
+        "integrity": "sha512-CsbWsf52DYkj05Xejw3B48dykY7joSAJKxopwL81vHxRDFNqut7caejxYhj7UbkeDoSeJrPjG2l0Nlv34e0/GQ=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "2.0.3"
+  }
+}

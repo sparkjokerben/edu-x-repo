@@ -1,0 +1,17 @@
+{
+  "name": "sm-crypto",
+  "versions": {
+    "0.5.7": {
+      "name": "sm-crypto",
+      "version": "0.5.7",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/sm-crypto-0.5.7.tgz",
+        "shasum": "5b572e574e9976a9ee94a01f2799beb559391723",
+        "integrity": "sha512-Bxz1jWGtI7t/bn6Vbf4iGKcntslKVYAi6oBTtboTL+0WhqBTwsDFinIxIezjkBidxt8aNnEF1V3ZYU6TI0V1gQ=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.5.7"
+  }
+}

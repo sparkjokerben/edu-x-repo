@@ -1,0 +1,21 @@
+{
+  "name": "@edu-x/shared",
+  "versions": {
+    "0.1.0": {
+      "name": "@edu-x/shared",
+      "version": "0.1.0",
+      "description": "客户端与服务端共用的类型、常量与错误码",
+      "dependencies": {
+        "sm-crypto": "0.5.7"
+      },
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/edu-x-shared-0.1.0.tgz",
+        "shasum": "9cafe3ee677edbc7bee2b9211f389e7eec18a814",
+        "integrity": "sha512-BAoocROAhJu3rXQp0b+L19NvTu3adnjfj7YxXAEixioN/aPgoBLuZosFNTs8f2gzauegfIM6l0hq+LjcDDAL9Q=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "0.1.0"
+  }
+}

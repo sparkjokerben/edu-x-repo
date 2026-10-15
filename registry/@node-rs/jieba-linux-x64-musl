@@ -1,0 +1,17 @@
+{
+  "name": "@node-rs/jieba-linux-x64-musl",
+  "versions": {
+    "2.0.3": {
+      "name": "@node-rs/jieba-linux-x64-musl",
+      "version": "2.0.3",
+      "dist": {
+        "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/node-rs-jieba-linux-x64-musl-2.0.3.tgz",
+        "shasum": "fc41e816f80334b7b1284132ed5c5497886ef8bf",
+        "integrity": "sha512-jZYdwF9EcJay1srsGR7Z88OGGBbOluzPtzK8PMkuicdGmW1ax7cc0fNGpIoxzvu6Qc5ZNUl1U/gGAzpA/kxndA=="
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "2.0.3"
+  }
+}

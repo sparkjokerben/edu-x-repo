@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "publishedAt": "2026-10-15T10:09:55.150Z",
+  "extensions": [
+    {
+      "name": "@edu-x/extension-hint",
+      "version": "0.1.0",
+      "title": "今日提示",
+      "description": "每天一条班级提示；示例扩展，随安装包内置之外还可从官方目录安装。",
+      "dataScope": "只读展示提示内容，不读写任何数据。"
+    },
+    {
+      "name": "@edu-x/extension-memory",
+      "version": "0.1.0",
+      "title": "我的记忆",
+      "description": "记下老师要记住的事，秘书长会参考。可以在「记忆」页查看和整理。",
+      "dataScope": ""
+    },
+    {
+      "name": "@edu-x/extension-secretary",
+      "version": "0.1.0",
+      "title": "秘书长",
+      "description": "在对话里帮老师记事、查事；需要老师确认的，先问过再做。",
+      "dataScope": ""
+    }
+  ]
+}
