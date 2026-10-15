@@ -35,8 +35,16 @@ jobs:
           REF: ${{ inputs.ref }}
         run: |
           case "$REF" in
-            '' | *[!A-Za-z0-9._/-]*)
-              echo "发行引用不合法：$REF" >&2
+            v[0-9]*)
+              case "$REF" in
+                *[!A-Za-z0-9._-]*)
+                  echo "发行引用不合法：$REF" >&2
+                  exit 1
+                  ;;
+              esac
+              ;;
+            *)
+              echo "发行引用必须是 v 开头的标签：$REF" >&2
               exit 1
               ;;
           esac
@@ -47,6 +55,9 @@ jobs:
           repository: sparkjokerben/edu-x
           ref: ${{ inputs.ref }}
           token: ${{ secrets.MAIN_REPO_TOKEN }}
+          # 取完就把凭据从 git 配置里摘掉：后续构建跑的是这份代码，
+          # 不让构建过程继承能读私有主仓的令牌
+          persist-credentials: false
 
       - name: 装 pnpm
         uses: pnpm/action-setup@f520eceda224fe1a4aed5a2a27a194379a409996 # v6
@@ -98,8 +109,16 @@ jobs:
           REF: ${{ inputs.ref }}
         run: |
           case "$REF" in
-            '' | *[!A-Za-z0-9._/-]*)
-              echo "发行引用不合法：$REF" >&2
+            v[0-9]*)
+              case "$REF" in
+                *[!A-Za-z0-9._-]*)
+                  echo "发行引用不合法：$REF" >&2
+                  exit 1
+                  ;;
+              esac
+              ;;
+            *)
+              echo "发行引用必须是 v 开头的标签：$REF" >&2
               exit 1
               ;;
           esac
@@ -110,6 +129,9 @@ jobs:
           repository: sparkjokerben/edu-x
           ref: ${{ inputs.ref }}
           token: ${{ secrets.MAIN_REPO_TOKEN }}
+          # 取完就把凭据从 git 配置里摘掉：后续构建跑的是这份代码，
+          # 不让构建过程继承能读私有主仓的令牌
+          persist-credentials: false
 
       - name: 装 pnpm
         uses: pnpm/action-setup@f520eceda224fe1a4aed5a2a27a194379a409996 # v6
@@ -162,8 +184,16 @@ jobs:
           REF: ${{ inputs.ref }}
         run: |
           case "$REF" in
-            '' | *[!A-Za-z0-9._/-]*)
-              echo "发行引用不合法：$REF" >&2
+            v[0-9]*)
+              case "$REF" in
+                *[!A-Za-z0-9._-]*)
+                  echo "发行引用不合法：$REF" >&2
+                  exit 1
+                  ;;
+              esac
+              ;;
+            *)
+              echo "发行引用必须是 v 开头的标签：$REF" >&2
               exit 1
               ;;
           esac
@@ -174,6 +204,9 @@ jobs:
           repository: sparkjokerben/edu-x
           ref: ${{ inputs.ref }}
           token: ${{ secrets.MAIN_REPO_TOKEN }}
+          # 取完就把凭据从 git 配置里摘掉：后续构建跑的是这份代码，
+          # 不让构建过程继承能读私有主仓的令牌
+          persist-credentials: false
 
       - name: 装 pnpm
         uses: pnpm/action-setup@f520eceda224fe1a4aed5a2a27a194379a409996 # v6
