@@ -104,7 +104,9 @@ jobs:
     timeout-minutes: 45
 
     steps:
+      # Windows runner 默认 shell 是 PowerShell，这段是 bash 语法，显式指定
       - name: 校验发行引用（外部输入，先收口）
+        shell: bash
         env:
           REF: ${{ inputs.ref }}
         run: |
