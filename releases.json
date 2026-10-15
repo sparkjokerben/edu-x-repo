@@ -2,39 +2,39 @@
   "releases": [
     {
       "version": "0.1.0",
-      "date": "2026-10-15T12:00:56.396Z",
+      "date": "2026-10-15T12:42:35.284Z",
       "platforms": {
         "darwin-arm64": [
           {
             "file": "edu-x-0.1.0-arm64.dmg",
-            "sha256": "2f2176653d45996d2bf700b9169bfffbcb8ed646324340d0b2b5bfc70f035701",
+            "sha256": "922bf82351f59fdd7907ae3c9dde869d483741705e1d328f87255da8a51060d4",
             "url": "https://github.com/sparkjokerben/edu-x-repo/releases/download/v0.1.0/edu-x-0.1.0-arm64.dmg"
           },
           {
             "file": "edu-x-0.1.0-arm64.dmg.blockmap",
-            "sha256": "f097f4780ef0a203fa1547fd0ca96f6b99924e4ba2d158d5b42e0ec3f9a6bcd2",
+            "sha256": "d7c64c5e3c39dc5a98d856da7021aa081d770ef3ee08118a7c5e823577ee7f7f",
             "url": "https://github.com/sparkjokerben/edu-x-repo/releases/download/v0.1.0/edu-x-0.1.0-arm64.dmg.blockmap"
           },
           {
             "file": "edu-x-0.1.0-arm64.zip",
-            "sha256": "45485b688f0c459dd972ebd06ea3dbe322b1d07c7d3d0fcae226f7ab25a2ce65",
+            "sha256": "e82db392c53a5fbbebff631da341584fff6a9900ebe5bb3d8cf8b8b39c03e31f",
             "url": "https://github.com/sparkjokerben/edu-x-repo/releases/download/v0.1.0/edu-x-0.1.0-arm64.zip"
           },
           {
             "file": "edu-x-0.1.0-arm64.zip.blockmap",
-            "sha256": "b8ad7b7c0b6a62970b7fa9daf9244f67c62240f6124d62ee1d55787e165eae29",
+            "sha256": "d875bbe6cbbe5670a215c11808fb6a6dc41e2117a11f85a59b73ce8983ad18a5",
             "url": "https://github.com/sparkjokerben/edu-x-repo/releases/download/v0.1.0/edu-x-0.1.0-arm64.zip.blockmap"
           }
         ],
         "win32-x64": [
           {
             "file": "edu-x-0.1.0-x64-setup.exe",
-            "sha256": "315d882828307c45465d5e56318e12e3566177352d4349867f6d63c5f44d6269",
+            "sha256": "25da723f200fa608e0253dbf7cacc1c2b2e51215eb76f3c37723e1e365e2b9a8",
             "url": "https://github.com/sparkjokerben/edu-x-repo/releases/download/v0.1.0/edu-x-0.1.0-x64-setup.exe"
           },
           {
             "file": "edu-x-0.1.0-x64-setup.exe.blockmap",
-            "sha256": "a40dd07c13090bdce28da761a9e684fb4019b0548c425ddf6ca064a65350e28c",
+            "sha256": "baddf1614426dc6450152c44dadea2357bca4b9f2e50bb3f589c0ed5ce736ee9",
             "url": "https://github.com/sparkjokerben/edu-x-repo/releases/download/v0.1.0/edu-x-0.1.0-x64-setup.exe.blockmap"
           }
         ]
@@ -44,12 +44,12 @@
   "feed": [
     {
       "file": "latest-mac.yml",
-      "sha256": "c3569b1ce59f55edc97ea79db0736213bd7cdd9d68c33ae64ebeadc4c60e3255",
+      "sha256": "531dcd905740ee18dd9b8102a4e9187ee3f86f4a1089d5cec93e226b36ddad44",
       "url": "https://github.com/sparkjokerben/edu-x-repo/releases/download/v0.1.0/latest-mac.yml"
     },
     {
       "file": "latest.yml",
-      "sha256": "f6f17ec0e30d35a0c0abe757427a8f760b991340dacb6fd389dac005e608b12a",
+      "sha256": "38385b14e58587c601b12476b83b5536d4171799e06dea48e7f861d2fa3ef5b7",
       "url": "https://github.com/sparkjokerben/edu-x-repo/releases/download/v0.1.0/latest.yml"
     }
   ]
