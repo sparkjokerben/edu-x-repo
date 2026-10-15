@@ -1,0 +1,225 @@
+name: 发行
+
+# 这份 workflow 跑在**公开的分发仓**（edu-x-repo）里——公开仓的 Actions
+# 额度免费无限，而发行链最费的就是 macOS 构建。主仓保持私有，只留一个
+# 轻量壳（tag 触发后转调这里的 workflow_dispatch）。
+#
+# 需要的仓库配置（都在分发仓这一侧）：
+#   secrets.MAIN_REPO_TOKEN  —— 对私有主仓 sparkjokerben/edu-x 有 Contents 读权限
+#   secrets.DIST_REPO_TOKEN  —— 对本仓有 Contents 读写权限（发布与推送目录）
+#   secrets.COS_SECRET_ID / COS_SECRET_KEY、vars.COS_BUCKET / COS_REGION（可选，COS 镜像）
+#   vars.PUBLISH_RELEASE=true 才外发；否则只出工件。
+#
+# 用法：workflow_dispatch，inputs.ref 填主仓的 tag（如 v0.1.0）。
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 主仓的 tag 或 commit（如 v0.1.0）
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    name: macOS 发行包（arm64）
+    runs-on: macos-14
+    timeout-minutes: 45
+
+    steps:
+      - name: 取代码（私有主仓）
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: sparkjokerben/edu-x
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.MAIN_REPO_TOKEN }}
+
+      - name: 装 pnpm
+        uses: pnpm/action-setup@f520eceda224fe1a4aed5a2a27a194379a409996 # v6
+
+      - name: 装 Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: 缓存 Electron 二进制
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.cache/electron
+          key: electron-${{ runner.os }}-arm64-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: electron-${{ runner.os }}-arm64-
+
+      - name: 装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建本仓各包
+        run: pnpm build
+
+      - name: 打包（release 通道，不发布——上传统一在汇总 job）
+        working-directory: apps/desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: pnpm run dist:release --publish never
+
+      - name: 上传工件
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: edu-x-macos-arm64
+          path: |
+            apps/desktop/release/*.dmg
+            apps/desktop/release/*.zip
+            apps/desktop/release/*.blockmap
+            apps/desktop/release/latest-mac.yml
+          if-no-files-found: error
+
+  windows:
+    name: Windows 发行包（x64）
+    runs-on: windows-2022
+    timeout-minutes: 45
+
+    steps:
+      - name: 取代码（私有主仓）
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: sparkjokerben/edu-x
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.MAIN_REPO_TOKEN }}
+
+      - name: 装 pnpm
+        uses: pnpm/action-setup@f520eceda224fe1a4aed5a2a27a194379a409996 # v6
+
+      - name: 装 Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: 缓存 Electron 二进制
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~\AppData\Local\electron\Cache
+          key: electron-${{ runner.os }}-x64-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: electron-${{ runner.os }}-x64-
+
+      - name: 装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建本仓各包
+        run: pnpm build
+
+      - name: 打包（release 通道，不发布——上传统一在汇总 job）
+        working-directory: apps/desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: pnpm run dist:release --publish never
+
+      - name: 上传工件
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: edu-x-windows-x64
+          path: |
+            apps/desktop/release/*.exe
+            apps/desktop/release/*.blockmap
+            apps/desktop/release/latest.yml
+          if-no-files-found: error
+
+  publish:
+    name: 发布与目录上架
+    if: ${{ vars.PUBLISH_RELEASE == 'true' }}
+    needs: [macos, windows]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: 取代码（私有主仓）
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: sparkjokerben/edu-x
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.MAIN_REPO_TOKEN }}
+
+      - name: 装 pnpm
+        uses: pnpm/action-setup@f520eceda224fe1a4aed5a2a27a194379a409996 # v6
+
+      - name: 装 Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: 装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建本仓各包
+        run: pnpm build
+
+      - name: 取回安装包工件
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: edu-x-*
+          merge-multiple: true
+          path: artifacts
+
+      # 安装包统一在这里上传：gh 的资产上传对上百 MB 的文件是稳的，
+      # electron-builder 自己的 publish 在 CI 上会静默跳过大文件。
+      - name: 建 Release 并上传安装包
+        env:
+          GH_TOKEN: ${{ secrets.DIST_REPO_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./apps/desktop/package.json').version")
+          TAG="v$VERSION"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          gh release view "$TAG" --repo sparkjokerben/edu-x-repo > /dev/null 2>&1 \
+            || gh release create "$TAG" --repo sparkjokerben/edu-x-repo \
+                 --title "edu-x $VERSION" --notes "edu-x ${VERSION} 的安装包与更新通道。"
+          gh release upload "$TAG" artifacts/* --repo sparkjokerben/edu-x-repo --clobber
+
+      # 发行目录是累积树：克隆分发仓（就是本仓），发布器按包名就地合并，再整树提交推送。
+      - name: 上架扩展目录
+        env:
+          DIST_TOKEN: ${{ secrets.DIST_REPO_TOKEN }}
+        run: |
+          git config --global user.name "edu-x-release"
+          git config --global user.email "release@edu-x.goof.com.cn"
+          git clone --depth 1 "https://x-access-token:${DIST_TOKEN}@github.com/sparkjokerben/edu-x-repo.git" distwork
+          node tools/publish-official.mjs \
+            --package extensions/hint \
+            --package extensions/secretary \
+            --package extensions/memory \
+            --out distwork \
+            --base-url https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main
+
+      # 版本元数据：服务端据此镜像最近几个版本的安装包。先拿 Release 的
+      # 资产名单做对照——工件里有、资产里没有的直接报错，绝不生成指向
+      # 404 的下载地址。
+      - name: 生成版本元数据
+        env:
+          GH_TOKEN: ${{ secrets.DIST_REPO_TOKEN }}
+        run: |
+          TAG="v${VERSION}"
+          gh release view "$TAG" --repo sparkjokerben/edu-x-repo --json assets --jq '.assets[].name' > assets.txt
+          node tools/release-meta.mjs --dir artifacts --out distwork/releases.json \
+            --version "$VERSION" --tag "$TAG" --repo sparkjokerben/edu-x-repo --assets assets.txt
+
+      - name: 提交推送分发仓
+        run: |
+          cd distwork
+          git add -A
+          git diff --cached --quiet || git commit -m "发行更新（v${VERSION}）"
+          git push
+
+      # COS 是服务端的兜底来源。跨境直传慢，经全球加速域名走专线（桶上要先在
+      # 控制台开「全球加速」）；没配桶就跳过——服务端还有 GitHub 一个来源。
+      - name: 同步 COS 镜像
+        if: ${{ vars.COS_BUCKET != '' }}
+        env:
+          COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
+          COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
+          COS_BUCKET: ${{ vars.COS_BUCKET }}
+          COS_REGION: ${{ vars.COS_REGION }}
+          COS_ACCELERATE: 'true'
+        run: node tools/sync-cos.mjs --dir artifacts --file distwork/releases.json
