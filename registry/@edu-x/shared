@@ -10,8 +10,8 @@
       },
       "dist": {
         "tarball": "https://raw.githubusercontent.com/sparkjokerben/edu-x-repo/main/registry/edu-x-shared-0.1.0.tgz",
-        "shasum": "9cafe3ee677edbc7bee2b9211f389e7eec18a814",
-        "integrity": "sha512-BAoocROAhJu3rXQp0b+L19NvTu3adnjfj7YxXAEixioN/aPgoBLuZosFNTs8f2gzauegfIM6l0hq+LjcDDAL9Q=="
+        "shasum": "b1b277355538bc2ccd8a23d413102f6781f2bd27",
+        "integrity": "sha512-A7Ltt4UPvAdSx21L0hyqJ0dld5yjty6GtPA+okvmiXvbmgOKg83wgy+5yAFQqUiB7MFNBh91sEIm9nzOWRDYZg=="
       }
     }
   },
