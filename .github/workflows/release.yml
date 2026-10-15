@@ -6,7 +6,7 @@ name: 发行
 #
 # 需要的仓库配置（都在分发仓这一侧）：
 #   secrets.MAIN_REPO_TOKEN  —— 对私有主仓 sparkjokerben/edu-x 有 Contents 读权限
-#   secrets.DIST_REPO_TOKEN  —— 对本仓有 Contents 读写权限（发布与推送目录）
+#   （发布、推目录树、读资产都用 workflow 内置的 GITHUB_TOKEN，permissions 已授权）
 #   secrets.COS_SECRET_ID / COS_SECRET_KEY、vars.COS_BUCKET / COS_REGION（可选，COS 镜像）
 #   vars.PUBLISH_RELEASE=true 才外发；否则只出工件。
 #
@@ -234,7 +234,8 @@ jobs:
       # electron-builder 自己的 publish 在 CI 上会静默跳过大文件。
       - name: 建 Release 并上传安装包
         env:
-          GH_TOKEN: ${{ secrets.DIST_REPO_TOKEN }}
+          # 内置 token：permissions 里已给本仓 contents: write，发布与读资产都够
+          GH_TOKEN: ${{ github.token }}
         run: |
           VERSION=$(node -p "require('./apps/desktop/package.json').version")
           TAG="v$VERSION"
@@ -247,7 +248,8 @@ jobs:
       # 发行目录是累积树：克隆分发仓（就是本仓），发布器按包名就地合并，再整树提交推送。
       - name: 上架扩展目录
         env:
-          DIST_TOKEN: ${{ secrets.DIST_REPO_TOKEN }}
+          # 内置 token 推本仓（permissions: contents: write）
+          DIST_TOKEN: ${{ github.token }}
         run: |
           git config --global user.name "edu-x-release"
           git config --global user.email "release@edu-x.goof.com.cn"
@@ -264,7 +266,8 @@ jobs:
       # 404 的下载地址。
       - name: 生成版本元数据
         env:
-          GH_TOKEN: ${{ secrets.DIST_REPO_TOKEN }}
+          # 内置 token：permissions 里已给本仓 contents: write，发布与读资产都够
+          GH_TOKEN: ${{ github.token }}
         run: |
           TAG="v${VERSION}"
           gh release view "$TAG" --repo sparkjokerben/edu-x-repo --json assets --jq '.assets[].name' > assets.txt
