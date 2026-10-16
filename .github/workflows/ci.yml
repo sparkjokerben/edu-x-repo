@@ -1,0 +1,211 @@
+name: CI
+
+# 这份 CI 跑在**公开的分发仓**（edu-x-repo）里——公开仓的 Actions 额度免费无限，
+# 而私有主仓额度有限：静态检查、集成测试与镜像推送（跨境推 TCR 要二三十分钟）
+# 全在这里跑，主仓只留一个几十秒的转调壳。
+#
+# 需要在这边的仓库配置：
+#   secrets.MAIN_REPO_TOKEN  —— 对私有主仓 sparkjokerben/edu-x 的 Contents 读权限
+#   vars.TCR_REGISTRY / vars.TCR_NAMESPACE
+#   secrets.TCR_USERNAME / secrets.TCR_PASSWORD（没配镜像仓库则镜像 job 跳过）
+#
+# 用法：workflow_dispatch，inputs.ref 填主仓的分支名、标签或 commit。
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 主仓的分支名、标签或 commit（如 main、v0.1.1）
+        required: true
+        type: string
+
+# 同一引用只跑最后一次
+concurrency:
+  group: ci-${{ inputs.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: 静态检查与测试
+    # 钉死镜像版本：ubuntu-latest 会不定期迁移（GitHub 已预告 2026-10-19 迁到 Ubuntu 26），
+    # 悄悄换基础镜像会让 CI 在某天莫名炸掉。升级时主动改这一行。
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: 校验引用（外部输入，先收口）
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          # 引用只当普通字段值传给 checkout，不经 shell 求值；形态先过白名单
+          case "$REF" in
+            ''|*[!A-Za-z0-9._/-]*|*..*)
+              echo "引用不合法：$REF" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: 取代码（私有主仓）
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: sparkjokerben/edu-x
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.MAIN_REPO_TOKEN }}
+          # 取完就把凭据从 git 配置里摘掉：后面的构建与测试不继承能读私有主仓的令牌
+          persist-credentials: false
+
+      - name: 装 pnpm
+        uses: pnpm/action-setup@f520eceda224fe1a4aed5a2a27a194379a409996 # v6
+
+      - name: 装 Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # Electron 的二进制有一百多兆，而且不在 pnpm store 里（装脚本另存一份缓存）。
+      # 不缓存的话每次 CI 都要重新下。
+      - name: 缓存 Electron 二进制
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.cache/electron
+          key: electron-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: electron-${{ runner.os }}-
+
+      - name: 装依赖
+        run: pnpm install --frozen-lockfile
+
+      # 构建必须排在检查前面：lint 与 typecheck 是类型感知的，读的是各包
+      # 构建产物（dist/*.d.ts）。不先构建，跨包引用会解析不到，报一堆假错误。
+      - name: 构建各包
+        run: pnpm build
+
+      - name: 格式检查
+        run: pnpm format:check
+
+      - name: 静态检查
+        run: pnpm lint
+
+      - name: 类型检查
+        run: pnpm typecheck
+
+      # xvfb-run 提供一块虚拟显示器：Electron 要开真窗口，CI 机器没有图形界面。
+      - name: 测试（集成测试拉 PostgreSQL 容器，端到端开真 Electron 窗口）
+        run: xvfb-run -a pnpm test
+
+  image:
+    name: 构建并推送服务端镜像
+    needs: checks
+    # 没配 TCR_REGISTRY 就整个跳过，而不是报红。镜像仓库还没配好时，
+    # CI 该显示“代码没问题”，不该显示“失败”——红叉要留给真正的问题。
+    # 配了一半的情况由下面的核对步骤明确报错。
+    if: vars.TCR_REGISTRY != ''
+    runs-on: ubuntu-24.04
+    # 跨境把镜像推给 TCR 很慢（实测二十分钟量级），超时给足；
+    # 公开仓额度免费，慢一点不心疼。
+    timeout-minutes: 45
+    steps:
+      - name: 校验引用（外部输入，先收口）
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          case "$REF" in
+            ''|*[!A-Za-z0-9._/-]*|*..*)
+              echo "引用不合法：$REF" >&2
+              exit 1
+              ;;
+          esac
+
+      # 与其让后面的步骤报一堆看不懂的鉴权错误，不如在这里一次说清楚缺什么。
+      # 仓库地址和命名空间用「变量」而不是「机密」：它们不是秘密，
+      # 放变量里日志才看得见完整镜像地址，部署时能直接抄。
+      - name: 核对镜像仓库配置
+        env:
+          TCR_NAMESPACE: ${{ vars.TCR_NAMESPACE }}
+          TCR_USERNAME: ${{ secrets.TCR_USERNAME }}
+          TCR_PASSWORD: ${{ secrets.TCR_PASSWORD }}
+        run: |
+          missing=''
+          [ -n "$TCR_NAMESPACE" ] || missing="$missing 变量TCR_NAMESPACE"
+          [ -n "$TCR_USERNAME" ]  || missing="$missing 机密TCR_USERNAME"
+          [ -n "$TCR_PASSWORD" ]  || missing="$missing 机密TCR_PASSWORD"
+          if [ -n "$missing" ]; then
+            echo "::error::镜像仓库配了一半，缺：$missing（配法见 docs/部署与合规清单.md）"
+            exit 1
+          fi
+
+      - name: 取代码（私有主仓）
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: sparkjokerben/edu-x
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.MAIN_REPO_TOKEN }}
+          persist-credentials: false
+
+      # 标签按「主仓那边的引用」算，不看本仓的 github.ref：
+      #   main        —— 主干最新，开发联调用
+      #   sha-<短哈希> —— 唯一且可追溯，**生产环境就该钉这个或版本号**
+      #   0.1.1       —— 主仓引用是 v0.1.1 这样的标签时产出
+      #   latest      —— 只有正式版本标签才给，不给主干
+      - name: 算镜像标签
+        id: tags
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          IMAGE="${{ vars.TCR_REGISTRY }}/${{ vars.TCR_NAMESPACE }}/edu-x-server"
+          SHORT=$(git rev-parse --short HEAD)
+          TAGS="$IMAGE:sha-$SHORT"
+          if [ "$REF" = "main" ]; then
+            TAGS="$TAGS,$IMAGE:main"
+          fi
+          case "$REF" in
+            v[0-9]*) TAGS="$TAGS,$IMAGE:${REF#v},$IMAGE:latest" ;;
+          esac
+          {
+            echo "list<<EOF"
+            echo "$TAGS" | tr ',' '\n'
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: 准备 buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
+
+      - name: 登录镜像仓库
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
+        with:
+          registry: ${{ vars.TCR_REGISTRY }}
+          username: ${{ secrets.TCR_USERNAME }}
+          password: ${{ secrets.TCR_PASSWORD }}
+
+      - name: 构建并推送
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
+        with:
+          context: .
+          file: apps/server/Dockerfile
+          push: true
+          # 服务器是 x86_64，runner 也是，原生构建不用 QEMU，快得多。
+          platforms: linux/amd64
+          tags: ${{ steps.tags.outputs.list }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/sparkjokerben/edu-x
+            org.opencontainers.image.revision=${{ inputs.ref }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # 关掉来源证明与物料清单：它们会让推上去的不再是一个普通镜像，
+          # 而是带附加清单的 OCI 索引，部分镜像仓库（含 TCR 个人版）认不了。
+          # 内测期不需要这两样东西，要开的话先在目标仓库上验证。
+          provenance: false
+          sbom: false
+
+      - name: 记下这次推了哪些镜像
+        env:
+          PUSHED_TAGS: ${{ steps.tags.outputs.list }}
+        run: |
+          echo "推送完成，镜像地址：" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo '```' | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "$PUSHED_TAGS" | tee -a "$GITHUB_STEP_SUMMARY"
+          echo '```' | tee -a "$GITHUB_STEP_SUMMARY"
+          echo "生产环境 .env 里的 SERVER_IMAGE 钉 :sha-<短哈希> 或 :<版本号>，别用 main / latest。" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
