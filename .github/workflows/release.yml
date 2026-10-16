@@ -23,6 +23,13 @@ on:
 permissions:
   contents: write
 
+# 发行不允许并行：两个 run 会各自克隆分发仓、各自生成 releases.json——先推的
+# 那份生成时后一个版本还不存在，台账里就永远没有它；后推的那份再因非快进
+# 失败整个 job。后到的等前面跑完（不是把正在跑的掐掉，发版做一半被取消最危险）。
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   macos:
     name: macOS 发行包（arm64）
@@ -67,6 +74,19 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
+
+      # 版本号必须与触发引用一致，构建前先拦：对不上的话，发布阶段那句
+      # gh release upload --clobber 会覆盖**另一个 tag** 上已发出去的安装包，
+      # 而这次引用的 Release 根本不会创建——流水线全绿，线上却发错了版本。
+      - name: 校验版本与发行引用一致
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          VERSION=$(node -p "require('./apps/desktop/package.json').version")
+          if [ "v$VERSION" != "$REF" ]; then
+            echo "::error::apps/desktop/package.json 是 $VERSION，与发行引用 $REF 对不上。"
+            exit 1
+          fi
 
       - name: 缓存 Electron 二进制
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -143,6 +163,18 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
+
+      # 版本号必须与触发引用一致，构建前先拦（见 macOS job 同一步的说明）
+      - name: 校验版本与发行引用一致
+        shell: bash
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          VERSION=$(node -p "require('./apps/desktop/package.json').version")
+          if [ "v$VERSION" != "$REF" ]; then
+            echo "::error::apps/desktop/package.json 是 $VERSION，与发行引用 $REF 对不上。"
+            exit 1
+          fi
 
       - name: 缓存 Electron 二进制
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
@@ -238,9 +270,16 @@ jobs:
         env:
           # 内置 token：permissions 里已给本仓 contents: write，发布与读资产都够
           GH_TOKEN: ${{ github.token }}
+          REF: ${{ inputs.ref }}
         run: |
           VERSION=$(node -p "require('./apps/desktop/package.json').version")
           TAG="v$VERSION"
+          # 再核一次（两个构建 job 已核过）：这里的 TAG 由检出代码里的版本算出，
+          # 一旦与触发引用不一致，下面 --clobber 会把另一个 tag 的发行覆盖掉
+          if [ "$TAG" != "$REF" ]; then
+            echo "::error::apps/desktop/package.json 是 $VERSION，与发行引用 $REF 对不上。"
+            exit 1
+          fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           gh release view "$TAG" --repo sparkjokerben/edu-x-repo > /dev/null 2>&1 \
             || gh release create "$TAG" --repo sparkjokerben/edu-x-repo \

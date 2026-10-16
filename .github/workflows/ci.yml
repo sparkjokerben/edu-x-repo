@@ -169,16 +169,17 @@ jobs:
           if [ "$REF" = "main" ]; then
             TAGS="$TAGS,$IMAGE:main"
           fi
-          case "$REF" in
-            v[0-9]*.[0-9]*.[0-9]*)
-              WANT=$(git rev-parse "${REF}^{commit}" 2>/dev/null || echo '')
-              if [ -z "$WANT" ] || [ "$WANT" != "$(git rev-parse HEAD)" ]; then
-                echo "::error::主仓里没有标签 $REF，或它不指向本次检出的提交——不产出版本号与 latest。"
-                exit 1
-              fi
-              TAGS="$TAGS,$IMAGE:${REF#v},$IMAGE:latest"
-              ;;
-          esac
+          # 版本标签要「整串」是 v<数字>.<数字>.<数字>：case 的结尾 * 会把
+          # v0.2.0-beta 这类预发布标签也放进来，顺手发出 :latest——latest
+          # 只该指向正式的发行版。用正则钉住整串。
+          if printf '%s' "$REF" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            WANT=$(git rev-parse "${REF}^{commit}" 2>/dev/null || echo '')
+            if [ -z "$WANT" ] || [ "$WANT" != "$(git rev-parse HEAD)" ]; then
+              echo "::error::主仓里没有标签 $REF，或它不指向本次检出的提交——不产出版本号与 latest。"
+              exit 1
+            fi
+            TAGS="$TAGS,$IMAGE:${REF#v},$IMAGE:latest"
+          fi
           {
             echo "list<<EOF"
             echo "$TAGS" | tr ',' '\n'
