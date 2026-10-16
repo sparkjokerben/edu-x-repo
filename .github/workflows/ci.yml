@@ -4,6 +4,10 @@ name: CI
 # 而私有主仓额度有限：静态检查、集成测试与镜像推送（跨境推 TCR 要二三十分钟）
 # 全在这里跑，主仓只留一个几十秒的转调壳。
 #
+# **本仓是公开仓**：这个工作流的运行日志对所有人可见，而日志里会出现取自
+# 私有主仓的代码路径、报错片段与测试输出。写这份工作流时不要把密钥、内部
+# 地址或不该公开的内容打进日志；要输出调试信息先想清楚它是给谁看的。
+#
 # 需要在这边的仓库配置：
 #   secrets.MAIN_REPO_TOKEN  —— 对私有主仓 sparkjokerben/edu-x 的 Contents 读权限
 #   vars.TCR_REGISTRY / vars.TCR_NAMESPACE
@@ -98,10 +102,12 @@ jobs:
   image:
     name: 构建并推送服务端镜像
     needs: checks
-    # 没配 TCR_REGISTRY 就整个跳过，而不是报红。镜像仓库还没配好时，
+    # 没配 TCR_REGISTRY / TCR_NAMESPACE 就整个跳过，而不是报红。镜像仓库还没配好时，
     # CI 该显示“代码没问题”，不该显示“失败”——红叉要留给真正的问题。
-    # 配了一半的情况由下面的核对步骤明确报错。
-    if: vars.TCR_REGISTRY != ''
+    # 两个变量都要：镜像名是 <registry>/<namespace>/edu-x-server 拼出来的，
+    # 只查其一，另一个空着也会进来拼出一个残地址。
+    # 凭据（TCR_USERNAME/TCR_PASSWORD）由下面的核对步骤明确报错。
+    if: vars.TCR_REGISTRY != '' && vars.TCR_NAMESPACE != ''
     runs-on: ubuntu-24.04
     # 跨境把镜像推给 TCR 很慢（实测二十分钟量级），超时给足；
     # 公开仓额度免费，慢一点不心疼。
@@ -143,25 +149,35 @@ jobs:
           ref: ${{ inputs.ref }}
           token: ${{ secrets.MAIN_REPO_TOKEN }}
           persist-credentials: false
+          # 带标签下来：下面要核对「版本号标签确实指向这次检出的提交」
+          fetch-tags: true
 
       # 标签按「主仓那边的引用」算，不看本仓的 github.ref：
       #   main        —— 主干最新，开发联调用
       #   sha-<短哈希> —— 唯一且可追溯，**生产环境就该钉这个或版本号**
       #   0.1.1       —— 主仓引用是 v0.1.1 这样的标签时产出
-      #   latest      —— 只有正式版本标签才给，不给主干
+      #   latest      —— 只认主仓里真实存在、且指向本次检出提交的版本标签，
+      #                  手工触发传错引用时不会凭空造出一个 :latest
       - name: 算镜像标签
         id: tags
         env:
           REF: ${{ inputs.ref }}
+          IMAGE: ${{ vars.TCR_REGISTRY }}/${{ vars.TCR_NAMESPACE }}/edu-x-server
         run: |
-          IMAGE="${{ vars.TCR_REGISTRY }}/${{ vars.TCR_NAMESPACE }}/edu-x-server"
           SHORT=$(git rev-parse --short HEAD)
           TAGS="$IMAGE:sha-$SHORT"
           if [ "$REF" = "main" ]; then
             TAGS="$TAGS,$IMAGE:main"
           fi
           case "$REF" in
-            v[0-9]*) TAGS="$TAGS,$IMAGE:${REF#v},$IMAGE:latest" ;;
+            v[0-9]*.[0-9]*.[0-9]*)
+              WANT=$(git rev-parse "${REF}^{commit}" 2>/dev/null || echo '')
+              if [ -z "$WANT" ] || [ "$WANT" != "$(git rev-parse HEAD)" ]; then
+                echo "::error::主仓里没有标签 $REF，或它不指向本次检出的提交——不产出版本号与 latest。"
+                exit 1
+              fi
+              TAGS="$TAGS,$IMAGE:${REF#v},$IMAGE:latest"
+              ;;
           esac
           {
             echo "list<<EOF"
@@ -191,8 +207,10 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/sparkjokerben/edu-x
             org.opencontainers.image.revision=${{ inputs.ref }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # 刻意不用 type=gha 的构建缓存：本仓是公开仓，缓存对所有 GitHub 用户可读，
+          # 而这份镜像的层是从**私有**主仓的代码编出来的——缓存等于把私有产物
+          # 摆在公开货架上。多花一两分钟重装依赖，换不泄露。
+          #
           # 关掉来源证明与物料清单：它们会让推上去的不再是一个普通镜像，
           # 而是带附加清单的 OCI 索引，部分镜像仓库（含 TCR 个人版）认不了。
           # 内测期不需要这两样东西，要开的话先在目标仓库上验证。
