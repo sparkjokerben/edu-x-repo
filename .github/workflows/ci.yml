@@ -13,15 +13,23 @@ name: CI
 #   vars.TCR_REGISTRY / vars.TCR_NAMESPACE
 #   secrets.TCR_USERNAME / secrets.TCR_PASSWORD（没配镜像仓库则镜像 job 跳过）
 #
+# 镜像只在两种情况下构建：主仓推 `server-v<版本>` 标签（正式服务端镜像），
+# 或在公开仓手动运行本工作流并勾选 build_image（开发联调用）。推 main 只跑检查。
+#
 # 用法：workflow_dispatch，inputs.ref 填主仓的分支名、标签或 commit。
 
 on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 主仓的分支名、标签或 commit（如 main、v0.1.1）
+        description: 主仓的分支名、标签或 commit（如 main、v0.1.1、server-v0.1.1）
         required: true
         type: string
+      build_image:
+        description: 引用不是 server-v* 标签时也构建开发镜像（sha/main）
+        required: false
+        default: false
+        type: boolean
 
 # 同一引用只跑最后一次
 concurrency:
@@ -102,12 +110,14 @@ jobs:
   image:
     name: 构建并推送服务端镜像
     needs: checks
+    # 只有服务端版本标签（server-v*）或手动勾选 build_image 才构建镜像，
+    # 推 main 只跑检查——否则每次推送都会在镜像仓库里留下一个新镜像。
     # 没配 TCR_REGISTRY / TCR_NAMESPACE 就整个跳过，而不是报红。镜像仓库还没配好时，
     # CI 该显示“代码没问题”，不该显示“失败”——红叉要留给真正的问题。
     # 两个变量都要：镜像名是 <registry>/<namespace>/edu-x-server 拼出来的，
     # 只查其一，另一个空着也会进来拼出一个残地址。
     # 凭据（TCR_USERNAME/TCR_PASSWORD）由下面的核对步骤明确报错。
-    if: vars.TCR_REGISTRY != '' && vars.TCR_NAMESPACE != ''
+    if: ${{ vars.TCR_REGISTRY != '' && vars.TCR_NAMESPACE != '' && (inputs.build_image || startsWith(inputs.ref, 'server-v')) }}
     runs-on: ubuntu-24.04
     # 跨境把镜像推给 TCR 很慢（实测二十分钟量级），超时给足；
     # 公开仓额度免费，慢一点不心疼。
@@ -153,37 +163,48 @@ jobs:
           fetch-tags: true
 
       # 标签按「主仓那边的引用」算，不看本仓的 github.ref：
-      #   main        —— 主干最新，开发联调用
-      #   sha-<短哈希> —— 唯一且可追溯，**生产环境就该钉这个或版本号**
-      #   0.1.1       —— 主仓引用是 v0.1.1 这样的标签时产出
-      #   latest      —— 只认主仓里真实存在、且指向本次检出提交的版本标签，
-      #                  手工触发传错引用时不会凭空造出一个 :latest
+      #   server-v<版本> —— 正式服务端镜像，推 <版本> 与 latest
+      #   sha-<短哈希>   —— 仅手动 build_image 的开发联调镜像，唯一且可追溯
+      #   main           —— 仅手动 build_image 且引用是 main 时推送，会被覆盖
       - name: 算镜像标签
         id: tags
         env:
           REF: ${{ inputs.ref }}
           IMAGE: ${{ vars.TCR_REGISTRY }}/${{ vars.TCR_NAMESPACE }}/edu-x-server
         run: |
+          REVISION=$(git rev-parse HEAD)
           SHORT=$(git rev-parse --short HEAD)
-          TAGS="$IMAGE:sha-$SHORT"
-          if [ "$REF" = "main" ]; then
-            TAGS="$TAGS,$IMAGE:main"
-          fi
-          # 版本标签要「整串」是 v<数字>.<数字>.<数字>：case 的结尾 * 会把
-          # v0.2.0-beta 这类预发布标签也放进来，顺手发出 :latest——latest
-          # 只该指向正式的发行版。用正则钉住整串。
-          if printf '%s' "$REF" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
-            WANT=$(git rev-parse "${REF}^{commit}" 2>/dev/null || echo '')
-            if [ -z "$WANT" ] || [ "$WANT" != "$(git rev-parse HEAD)" ]; then
-              echo "::error::主仓里没有标签 $REF，或它不指向本次检出的提交——不产出版本号与 latest。"
+          VERSION=''
+
+          # 服务端正式镜像只由 server-vX.Y.Z 标签产出：版本号要与
+          # apps/server/package.json 一致，标签还必须确实指向本次检出的提交。
+          if printf '%s' "$REF" | grep -Eq '^server-v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            VERSION=${REF#server-v}
+            EXPECTED=$(node -p "require('./apps/server/package.json').version")
+            if [ "$VERSION" != "$EXPECTED" ]; then
+              echo "::error::apps/server/package.json 是 $EXPECTED，与服务端标签 $REF 对不上。"
               exit 1
             fi
-            TAGS="$TAGS,$IMAGE:${REF#v},$IMAGE:latest"
+            WANT=$(git rev-parse "${REF}^{commit}" 2>/dev/null || echo '')
+            if [ -z "$WANT" ] || [ "$WANT" != "$REVISION" ]; then
+              echo "::error::主仓里没有标签 $REF，或它不指向本次检出的提交——不产出服务端版本镜像。"
+              exit 1
+            fi
+            TAGS="$IMAGE:$VERSION,$IMAGE:latest"
+          else
+            # 走到这里只可能是手动勾选了 build_image。
+            TAGS="$IMAGE:sha-$SHORT"
+            if [ "$REF" = "main" ]; then
+              TAGS="$TAGS,$IMAGE:main"
+            fi
           fi
+
           {
             echo "list<<EOF"
             echo "$TAGS" | tr ',' '\n'
             echo "EOF"
+            echo "revision=$REVISION"
+            echo "version=${VERSION:-dev-$SHORT}"
           } >> "$GITHUB_OUTPUT"
 
       - name: 准备 buildx
@@ -207,7 +228,8 @@ jobs:
           tags: ${{ steps.tags.outputs.list }}
           labels: |
             org.opencontainers.image.source=https://github.com/sparkjokerben/edu-x
-            org.opencontainers.image.revision=${{ inputs.ref }}
+            org.opencontainers.image.revision=${{ steps.tags.outputs.revision }}
+            org.opencontainers.image.version=${{ steps.tags.outputs.version }}
           # 刻意不用 type=gha 的构建缓存：本仓是公开仓，缓存对所有 GitHub 用户可读，
           # 而这份镜像的层是从**私有**主仓的代码编出来的——缓存等于把私有产物
           # 摆在公开货架上。多花一两分钟重装依赖，换不泄露。
@@ -226,5 +248,5 @@ jobs:
           echo '```' | tee -a "$GITHUB_STEP_SUMMARY"
           echo "$PUSHED_TAGS" | tee -a "$GITHUB_STEP_SUMMARY"
           echo '```' | tee -a "$GITHUB_STEP_SUMMARY"
-          echo "生产环境 .env 里的 SERVER_IMAGE 钉 :sha-<短哈希> 或 :<版本号>，别用 main / latest。" \
+          echo "服务端正式镜像由 server-v<版本> 标签产出；生产 .env 的 SERVER_IMAGE 钉 :<版本号>，别用 latest。" \
             | tee -a "$GITHUB_STEP_SUMMARY"
