@@ -8,6 +8,7 @@ name: 发行
 #   secrets.MAIN_REPO_TOKEN  —— 对私有主仓 sparkjokerben/edu-x 有 Contents 读权限
 #   （发布、推目录树、读资产都用 workflow 内置的 GITHUB_TOKEN，permissions 已授权）
 #   secrets.COS_SECRET_ID / COS_SECRET_KEY、vars.COS_BUCKET / COS_REGION（可选，COS 镜像）
+#   vars.PUBLISH_COS=false 可跳过 COS；未设置或为 true 时保持现有同步行为。
 #   vars.PUBLISH_RELEASE=true 才外发；否则只出工件。
 #
 # 用法：workflow_dispatch，inputs.ref 填主仓的 tag（如 v0.1.0）。
@@ -326,9 +327,9 @@ jobs:
           git push
 
       # COS 是服务端的兜底来源。跨境直传慢，经全球加速域名走专线（桶上要先在
-      # 控制台开「全球加速」）；没配桶就跳过——服务端还有 GitHub 一个来源。
+      # 控制台开「全球加速」）；没配桶或 vars.PUBLISH_COS=false 时跳过本步。
       - name: 同步 COS 镜像
-        if: ${{ vars.COS_BUCKET != '' }}
+        if: ${{ vars.PUBLISH_COS != 'false' && vars.COS_BUCKET != '' }}
         env:
           COS_SECRET_ID: ${{ secrets.COS_SECRET_ID }}
           COS_SECRET_KEY: ${{ secrets.COS_SECRET_KEY }}
