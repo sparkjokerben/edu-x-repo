@@ -177,12 +177,12 @@ jobs:
           VERSION=''
 
           # 服务端正式镜像只由 server-vX.Y.Z 标签产出：版本号要与
-          # apps/server/package.json 一致，标签还必须确实指向本次检出的提交。
+          # server/package.json 一致，标签还必须确实指向本次检出的提交。
           if printf '%s' "$REF" | grep -Eq '^server-v[0-9]+\.[0-9]+\.[0-9]+$'; then
             VERSION=${REF#server-v}
-            EXPECTED=$(node -p "require('./apps/server/package.json').version")
+            EXPECTED=$(node -p "require('./server/package.json').version")
             if [ "$VERSION" != "$EXPECTED" ]; then
-              echo "::error::apps/server/package.json 是 $EXPECTED，与服务端标签 $REF 对不上。"
+              echo "::error::server/package.json 是 $EXPECTED，与服务端标签 $REF 对不上。"
               exit 1
             fi
             WANT=$(git rev-parse "${REF}^{commit}" 2>/dev/null || echo '')
@@ -221,7 +221,7 @@ jobs:
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
         with:
           context: .
-          file: apps/server/Dockerfile
+          file: server/Dockerfile
           push: true
           # 服务器是 x86_64，runner 也是，原生构建不用 QEMU，快得多。
           platforms: linux/amd64
